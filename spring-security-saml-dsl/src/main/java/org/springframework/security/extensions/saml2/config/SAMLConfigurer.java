@@ -64,7 +64,7 @@ public class SAMLConfigurer extends SecurityConfigurerAdapter<DefaultSecurityFil
 	private ServiceProvider serviceProvider = new ServiceProvider();
 	private WebSSOProfileConsumerImpl webSSOProfileConsumer = new WebSSOProfileConsumerImpl();
 
-	private WebSSOProfileOptions webSSOProfileOptions = webSSOProfileOptions();
+	private WebSSOProfileOptions webSSOProfileOptions;
 	private StaticBasicParserPool parserPool = staticBasicParserPool();
 	private SAMLProcessor samlProcessor = samlProcessor();
 	private SAMLDefaultLogger samlLogger = new SAMLDefaultLogger();
@@ -139,6 +139,11 @@ public class SAMLConfigurer extends SecurityConfigurerAdapter<DefaultSecurityFil
 		return this;
 	}
 
+    public SAMLConfigurer webSSOProfileOptions(WebSSOProfileOptions webSSOProfileOptions) {
+        this.webSSOProfileOptions = webSSOProfileOptions;
+        return this;
+    }
+
 	public IdentityProvider identityProvider() {
 		return identityProvider;
 	}
@@ -156,6 +161,10 @@ public class SAMLConfigurer extends SecurityConfigurerAdapter<DefaultSecurityFil
 
 	private SAMLEntryPoint samlEntryPoint(SAMLContextProvider contextProvider) {
 		SAMLEntryPoint samlEntryPoint = new SAMLDslEntryPoint();
+        if(webSSOProfileOptions == null) {
+            webSSOProfileOptions = new WebSSOProfileOptions();
+            webSSOProfileOptions.setIncludeScoping(false);
+        }
 		samlEntryPoint.setDefaultProfileOptions(webSSOProfileOptions);
 		samlEntryPoint.setWebSSOprofile(webSSOProfile);
 		samlEntryPoint.setContextProvider(contextProvider);
@@ -208,12 +217,6 @@ public class SAMLConfigurer extends SecurityConfigurerAdapter<DefaultSecurityFil
 		extendedMetadata.setIdpDiscoveryEnabled(discoveryEnabled);
 		extendedMetadata.setSignMetadata(true);
 		return extendedMetadata;
-	}
-
-	private WebSSOProfileOptions webSSOProfileOptions() {
-		WebSSOProfileOptions webSSOProfileOptions = new WebSSOProfileOptions();
-		webSSOProfileOptions.setIncludeScoping(false);
-		return webSSOProfileOptions;
 	}
 
 	private void bootstrap() {
